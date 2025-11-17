@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareWork.API", "CareWork.API\CareWork.API.csproj", "{5A6DB6F8-F060-46DD-B3B4-DC2931B12380}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareWork.Infrastructure", "CareWork.Infrastructure\CareWork.Infrastructure.csproj", "{B62D99B2-5CA2-4B92-AFA6-AD977310DC16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareWork.Tests", "CareWork.Tests\CareWork.Tests.csproj", "{E368CC4D-47CA-4A39-ACD4-E566CDFFB4DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A6DB6F8-F060-46DD-B3B4-DC2931B12380}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A6DB6F8-F060-46DD-B3B4-DC2931B12380}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A6DB6F8-F060-46DD-B3B4-DC2931B12380}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A6DB6F8-F060-46DD-B3B4-DC2931B12380}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B62D99B2-5CA2-4B92-AFA6-AD977310DC16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B62D99B2-5CA2-4B92-AFA6-AD977310DC16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B62D99B2-5CA2-4B92-AFA6-AD977310DC16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B62D99B2-5CA2-4B92-AFA6-AD977310DC16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E368CC4D-47CA-4A39-ACD4-E566CDFFB4DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E368CC4D-47CA-4A39-ACD4-E566CDFFB4DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E368CC4D-47CA-4A39-ACD4-E566CDFFB4DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E368CC4D-47CA-4A39-ACD4-E566CDFFB4DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
