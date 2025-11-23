@@ -34,53 +34,8 @@ public class CheckinsController : ControllerBase
     /// 📋 Lista todos os check-ins do usuário autenticado com paginação
     /// </summary>
     /// <remarks>
-    /// Retorna uma lista paginada de todos os check-ins do usuário autenticado, ordenados por data de criação (mais recentes primeiro).
-    /// 
-    /// **Parâmetros de paginação:**
-    /// - `page`: Número da página (padrão: 1, mínimo: 1)
-    /// - `pageSize`: Itens por página (padrão: 10, mínimo: 1, máximo: 100)
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```
-    /// GET /api/v1/checkins?page=1&pageSize=10
-    /// ```
-    /// 
-    /// **Exemplo de resposta (200 OK):**
-    /// ```json
-    /// {
-    ///   "data": [
-    ///     {
-    ///       "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///       "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///       "mood": 4,
-    ///       "stress": 2,
-    ///       "sleep": 5,
-    ///       "notes": "Dia produtivo, me senti bem",
-    ///       "tags": ["trabalho", "produtivo"],
-    ///       "createdAt": "2025-11-14T10:00:00Z",
-    ///       "updatedAt": null
-    ///     }
-    ///   ],
-    ///   "page": 1,
-    ///   "pageSize": 10,
-    ///   "totalCount": 25,
-    ///   "totalPages": 3,
-    ///   "hasPreviousPage": false,
-    ///   "hasNextPage": true,
-    ///   "links": {
-    ///     "self": "/api/v1/checkins?page=1&pageSize=10",
-    ///     "first": "/api/v1/checkins?page=1&pageSize=10",
-    ///     "last": "/api/v1/checkins?page=3&pageSize=10",
-    ///     "next": "/api/v1/checkins?page=2&pageSize=10",
-    ///     "previous": null
-    ///   }
-    /// }
-    /// ```
-    /// 
-    /// **Notas:**
-    /// - Apenas retorna check-ins do usuário autenticado
-    /// - Ordenação: mais recentes primeiro
-    /// - Use os links de paginação (HATEOAS) para navegar entre páginas
+    /// Retorna uma lista paginada de check-ins ordenados por data (mais recentes primeiro).
+    /// Inclui links HATEOAS para navegação entre páginas.
     /// </remarks>
     /// <param name="page">Número da página (padrão: 1)</param>
     /// <param name="pageSize">Itens por página (padrão: 10, máximo: 100)</param>
@@ -110,34 +65,7 @@ public class CheckinsController : ControllerBase
     /// 🔍 Busca um check-in específico por ID
     /// </summary>
     /// <remarks>
-    /// Retorna os detalhes completos de um check-in específico, desde que pertença ao usuário autenticado.
-    /// 
-    /// **Validações:**
-    /// - O ID deve ser um GUID válido
-    /// - O check-in deve pertencer ao usuário autenticado
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```
-    /// GET /api/v1/checkins/3fa85f64-5717-4562-b3fc-2c963f66afa6
-    /// ```
-    /// 
-    /// **Exemplo de resposta (200 OK):**
-    /// ```json
-    /// {
-    ///   "success": true,
-    ///   "data": {
-    ///     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "mood": 4,
-    ///     "stress": 2,
-    ///     "sleep": 5,
-    ///     "notes": "Dia produtivo",
-    ///     "tags": ["trabalho"],
-    ///     "createdAt": "2025-11-14T10:00:00Z",
-    ///     "updatedAt": null
-    ///   }
-    /// }
-    /// ```
+    /// Retorna os detalhes completos de um check-in específico do usuário autenticado.
     /// </remarks>
     /// <param name="id">ID único do check-in (GUID)</param>
     /// <returns>Detalhes completos do check-in</returns>
@@ -174,53 +102,8 @@ public class CheckinsController : ControllerBase
     /// ➕ Cria um novo check-in emocional
     /// </summary>
     /// <remarks>
-    /// Registra um novo check-in com avaliações de humor, stress e qualidade do sono.
-    /// 
-    /// **Validações obrigatórias:**
-    /// - `mood`: Número inteiro de 1 a 5 (1 = muito ruim, 5 = excelente)
-    /// - `stress`: Número inteiro de 1 a 5 (1 = sem stress, 5 = muito estressado)
-    /// - `sleep`: Número inteiro de 1 a 5 (1 = muito ruim, 5 = excelente)
-    /// 
-    /// **Campos opcionais:**
-    /// - `notes`: Texto livre para observações (string)
-    /// - `tags`: Array de strings para categorização (ex: ["trabalho", "produtivo"])
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```json
-    /// POST /api/v1/checkins
-    /// {
-    ///   "mood": 4,
-    ///   "stress": 2,
-    ///   "sleep": 5,
-    ///   "notes": "Dia produtivo, me senti bem e descansado",
-    ///   "tags": ["trabalho", "produtivo", "descansado"]
-    /// }
-    /// ```
-    /// 
-    /// **Exemplo de resposta (201 Created):**
-    /// ```json
-    /// {
-    ///   "success": true,
-    ///   "data": {
-    ///     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "mood": 4,
-    ///     "stress": 2,
-    ///     "sleep": 5,
-    ///     "notes": "Dia produtivo, me senti bem e descansado",
-    ///     "tags": ["trabalho", "produtivo", "descansado"],
-    ///     "createdAt": "2025-11-14T10:00:00Z",
-    ///     "updatedAt": null
-    ///   },
-    ///   "message": "Check-in created successfully"
-    /// }
-    /// ```
-    /// 
-    /// **Dicas:**
-    /// - Você pode criar múltiplos check-ins por dia
-    /// - Use `notes` para adicionar contexto sobre o dia
-    /// - Use `tags` para facilitar buscas e filtros futuros
-    /// - Os check-ins são usados para gerar insights e recomendações personalizadas
+    /// Registra um novo check-in com avaliações de humor (1-5), stress (1-5) e qualidade do sono (1-5).
+    /// Campos opcionais: notes (texto) e tags (array de strings).
     /// </remarks>
     /// <param name="dto">Dados do check-in (mood, stress, sleep obrigatórios; notes e tags opcionais)</param>
     /// <returns>Check-in criado com sucesso, incluindo ID gerado e timestamp</returns>
@@ -269,43 +152,7 @@ public class CheckinsController : ControllerBase
     /// ✏️ Atualiza um check-in existente
     /// </summary>
     /// <remarks>
-    /// Permite atualizar os dados de um check-in existente que pertence ao usuário autenticado.
-    /// 
-    /// **Validações:**
-    /// - O check-in deve existir e pertencer ao usuário autenticado
-    /// - Todos os campos são opcionais, mas se informados devem ser válidos
-    /// - `mood`, `stress`, `sleep`: devem estar entre 1 e 5 (se informados)
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```json
-    /// PUT /api/v1/checkins/3fa85f64-5717-4562-b3fc-2c963f66afa6
-    /// {
-    ///   "mood": 5,
-    ///   "stress": 1,
-    ///   "sleep": 5,
-    ///   "notes": "Atualizado: dia excelente!",
-    ///   "tags": ["feliz", "descansado"]
-    /// }
-    /// ```
-    /// 
-    /// **Exemplo de resposta (200 OK):**
-    /// ```json
-    /// {
-    ///   "success": true,
-    ///   "data": {
-    ///     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "mood": 5,
-    ///     "stress": 1,
-    ///     "sleep": 5,
-    ///     "notes": "Atualizado: dia excelente!",
-    ///     "tags": ["feliz", "descansado"],
-    ///     "updatedAt": "2025-11-14T11:00:00Z"
-    ///   },
-    ///   "message": "Check-in updated successfully"
-    /// }
-    /// ```
-    /// 
-    /// **Nota:** O campo `updatedAt` será atualizado automaticamente quando o check-in for modificado.
+    /// Atualiza os dados de um check-in do usuário autenticado. Todos os campos são opcionais.
     /// </remarks>
     /// <param name="id">ID único do check-in a ser atualizado (GUID)</param>
     /// <param name="dto">Dados atualizados do check-in (todos os campos são opcionais)</param>
@@ -358,26 +205,7 @@ public class CheckinsController : ControllerBase
     /// 🗑️ Deleta um check-in permanentemente
     /// </summary>
     /// <remarks>
-    /// Remove permanentemente um check-in do sistema. Esta ação é **irreversível**.
-    /// 
-    /// **Validações:**
-    /// - O check-in deve existir e pertencer ao usuário autenticado
-    /// - Apenas o dono do check-in pode deletá-lo
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```
-    /// DELETE /api/v1/checkins/3fa85f64-5717-4562-b3fc-2c963f66afa6
-    /// ```
-    /// 
-    /// **Exemplo de resposta (204 No Content):**
-    /// ```
-    /// (sem conteúdo no corpo da resposta)
-    /// ```
-    /// 
-    /// **⚠️ Atenção:**
-    /// - Esta ação não pode ser desfeita
-    /// - O check-in será removido permanentemente do banco de dados
-    /// - Isso pode afetar análises e relatórios que dependem deste check-in
+    /// Remove permanentemente um check-in do sistema. Ação irreversível.
     /// </remarks>
     /// <param name="id">ID único do check-in a ser deletado (GUID)</param>
     /// <returns>Nenhum conteúdo (204 No Content)</returns>

@@ -319,6 +319,18 @@ public class InsightsService : IInsightsService
             return new TrendAnalysisDto();
 
         var average = values.Average();
+        
+        // Se há menos de 2 valores, não podemos calcular tendência
+        if (values.Count < 2)
+        {
+            return new TrendAnalysisDto
+            {
+                Average = Math.Round(average, 2),
+                Trend = "stable",
+                ChangePercentage = 0
+            };
+        }
+
         var firstHalf = values.Take(values.Count / 2).Average();
         var secondHalf = values.Skip(values.Count / 2).Average();
         

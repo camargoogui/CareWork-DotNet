@@ -8,6 +8,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using CareWork.API.Middleware;
 using CareWork.API.Services;
+using CareWork.API.Swagger;
 using CareWork.Infrastructure.Data;
 using AutoMapper;
 
@@ -57,6 +58,7 @@ A **CareWork API V1** é a versão completa e estável da API desenvolvida em .N
 - ✅ **Relatórios Detalhados**: Relatórios semanais e mensais com análises completas
 - ✅ **Dicas Personalizadas**: Recomendações inteligentes baseadas no estado do usuário
 - ✅ **Gestão de Perfil**: Atualização de perfil, senha e exclusão de conta
+- ✅ **Tips Pré-cadastradas**: 20 dicas de bem-estar categorizadas (Stress, Sleep, Mood, Wellness)
 
 ### 🔐 Autenticação
 
@@ -68,21 +70,39 @@ Esta API utiliza **JWT (JSON Web Tokens)** para autenticação.
 3. Clique no botão **Authorize** acima e cole o token no formato: `Bearer {seu-token}`
 4. Agora você pode testar todos os endpoints autenticados
 
+### 🗄️ Banco de Dados
+
+- **SQL Server** (padrão - conforme requisito)
+- **Entity Framework Core 8** com Code First e Migrations
+- Suporte também a SQLite (desenvolvimento local) e Oracle/MongoDB (configurável)
+- Migrations executadas automaticamente na primeira execução
+
+### 🛠️ Tecnologias
+
+- **.NET 8** - Framework mais recente da Microsoft
+- **Entity Framework Core 8** - ORM com Code First
+- **SQL Server** - Banco de dados relacional (padrão)
+- **JWT Authentication** - Autenticação stateless
+- **Serilog** - Logging estruturado
+- **OpenTelemetry** - Distributed tracing
+- **Swagger/OpenAPI 3.0** - Documentação interativa
+
 ### 📚 Documentação Completa
 
 Para mais informações, consulte o README do projeto.
 
-### 🚀 Base URL
+### 🚀 URLs Importantes
 
-```
-http://localhost:8080/api/v1
-```
+- **Swagger UI**: `http://localhost:8080/swagger`
+- **Health Check**: `http://localhost:8080/health`
+- **Base API**: `http://localhost:8080/api/v1` (prefixo para todos os endpoints)
 
 ### ⚠️ Importante
 
 - Todos os endpoints autenticados requerem o header `Authorization: Bearer {token}`
 - O token expira em 24 horas
 - Use HTTPS em produção
+- Banco de dados criado automaticamente na primeira execução
         ",
         Contact = new OpenApiContact
         {
@@ -151,6 +171,12 @@ A V2 mantém compatibilidade com a V1, permitindo migração gradual.
         var controllerName = api.ActionDescriptor.RouteValues["controller"];
         return new[] { controllerName ?? "Default" };
     });
+
+    // ------------------------------------------------------------------------
+    // Exemplos para DTOs de Atualização (PUT)
+    // ------------------------------------------------------------------------
+    // Adiciona exemplos pré-preenchidos nos request bodies dos métodos PUT
+    c.SchemaFilter<ExampleSchemaFilter>();
 
     // ------------------------------------------------------------------------
     // Filtro de Inclusão por Versão (CRÍTICO PARA SEPARAÇÃO)
@@ -225,19 +251,25 @@ Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI...
 // ============================================================================
 // CONFIGURAÇÃO DO ENTITY FRAMEWORK CORE
 // ============================================================================
+// REQUISITO: Integração com SQL Server, Oracle ou MongoDB
+// Implementado: SQL Server (padrão) e SQLite (opcional para desenvolvimento local)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<CareWorkDbContext>(options =>
 {
-    if (builder.Environment.IsDevelopment())
+    // Verifica se é SQLite (para desenvolvimento local, especialmente macOS)
+    // Se a connection string começar com "Data Source=", assume SQLite
+    if (connectionString.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase))
     {
-        // SQLite para desenvolvimento (especialmente macOS)
+        // SQLite para desenvolvimento local (opcional)
+        // Para usar SQL Server, configure a connection string no appsettings.json
         options.UseSqlite(connectionString);
     }
     else
     {
-        // SQL Server para produção
+        // SQL Server (padrão - conforme requisito)
+        // Suporta: SQL Server, SQL Server LocalDB, Azure SQL
         options.UseSqlServer(connectionString);
     }
 });
@@ -363,9 +395,22 @@ app.UseSerilogRequestLogging(options =>
 });
 
 // ------------------------------------------------------------------------
-// HTTPS Redirection
+// HTTPS Redirection (apenas se HTTPS estiver disponível)
 // ------------------------------------------------------------------------
-app.UseHttpsRedirection();
+// Só usa HTTPS redirection se houver porta HTTPS configurada
+// Isso evita o warning "Failed to determine the https port for redirect"
+var applicationUrls = builder.Configuration["ASPNETCORE_URLS"] 
+    ?? builder.Configuration["applicationUrl"] 
+    ?? string.Empty;
+
+// Verifica se há alguma URL HTTPS configurada
+var hasHttps = applicationUrls.Contains("https://", StringComparison.OrdinalIgnoreCase) ||
+               (builder.Environment.IsProduction() && !applicationUrls.Contains("http://", StringComparison.OrdinalIgnoreCase));
+
+if (hasHttps)
+{
+    app.UseHttpsRedirection();
+}
 
 // ------------------------------------------------------------------------
 // Autenticação e Autorização (Ordem importante!)

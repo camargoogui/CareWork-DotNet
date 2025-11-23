@@ -27,26 +27,8 @@ public class TipsController : ControllerBase
     /// 📚 Lista todas as dicas de bem-estar com paginação e filtro por categoria
     /// </summary>
     /// <remarks>
-    /// Retorna uma lista paginada de todas as dicas disponíveis no sistema, com opção de filtrar por categoria.
-    /// 
-    /// **Categorias disponíveis:**
-    /// - `Stress`: Dicas para gerenciamento de stress
-    /// - `Sleep`: Dicas para melhorar a qualidade do sono
-    /// - `Mood`: Dicas para melhorar o humor
-    /// - `Wellness`: Dicas gerais de bem-estar
-    /// 
-    /// **Parâmetros:**
-    /// - `page`: Número da página (padrão: 1, mínimo: 1)
-    /// - `pageSize`: Itens por página (padrão: 10, mínimo: 1, máximo: 100)
-    /// - `category`: Filtro opcional por categoria (ex: "Stress", "Sleep", "Mood", "Wellness")
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```
-    /// GET /api/v1/tips?page=1&pageSize=10&category=Stress
-    /// ```
-    /// 
-    /// **Exemplo de resposta (200 OK):**
-    /// ```json
+    /// Retorna lista paginada de dicas. Filtro opcional por categoria: Stress, Sleep, Mood, Wellness.
+    /// </remarks>
     /// {
     ///   "data": [
     ///     {
@@ -100,29 +82,7 @@ public class TipsController : ControllerBase
     /// 🔍 Busca uma dica específica por ID
     /// </summary>
     /// <remarks>
-    /// Retorna os detalhes completos de uma dica específica pelo seu ID único.
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```
-    /// GET /api/v1/tips/3fa85f64-5717-4562-b3fc-2c963f66afa6
-    /// ```
-    /// 
-    /// **Exemplo de resposta (200 OK):**
-    /// ```json
-    /// {
-    ///   "success": true,
-    ///   "data": {
-    ///     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "title": "Técnicas de Respiração Profunda",
-    ///     "description": "Pratique respiração profunda por 5 minutos: inspire por 4 segundos, segure por 4, expire por 6. Isso ajuda a reduzir o stress imediatamente.",
-    ///     "icon": "breath",
-    ///     "color": "#FF5722",
-    ///     "category": "Stress",
-    ///     "createdAt": "2025-11-14T10:00:00Z",
-    ///     "updatedAt": null
-    ///   }
-    /// }
-    /// ```
+    /// Retorna os detalhes completos de uma dica específica por ID.
     /// </remarks>
     /// <param name="id">ID único da dica (GUID)</param>
     /// <returns>Detalhes completos da dica</returns>
@@ -158,46 +118,8 @@ public class TipsController : ControllerBase
     /// ➕ Cria uma nova dica de bem-estar
     /// </summary>
     /// <remarks>
-    /// Cria uma nova dica no sistema que ficará disponível para todos os usuários.
-    /// 
-    /// **Campos obrigatórios:**
-    /// - `title`: Título da dica (string)
-    /// - `description`: Descrição detalhada da dica (string)
-    /// - `category`: Categoria da dica - "Stress", "Sleep", "Mood" ou "Wellness"
-    /// 
-    /// **Campos opcionais:**
-    /// - `icon`: Nome do ícone (string, ex: "breath", "coffee")
-    /// - `color`: Cor em hexadecimal (string, ex: "#FF5722")
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```json
-    /// POST /api/v1/tips
-    /// {
-    ///   "title": "Dica de Bem-estar",
-    ///   "description": "Lembre-se de fazer pausas regulares durante o trabalho. A cada 50 minutos, faça uma pausa de 10 minutos para alongar e relaxar.",
-    ///   "icon": "coffee",
-    ///   "color": "#4CAF50",
-    ///   "category": "Wellness"
-    /// }
-    /// ```
-    /// 
-    /// **Exemplo de resposta (201 Created):**
-    /// ```json
-    /// {
-    ///   "success": true,
-    ///   "data": {
-    ///     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "title": "Dica de Bem-estar",
-    ///     "description": "Lembre-se de fazer pausas regulares durante o trabalho...",
-    ///     "icon": "coffee",
-    ///     "color": "#4CAF50",
-    ///     "category": "Wellness",
-    ///     "createdAt": "2025-11-14T10:00:00Z",
-    ///     "updatedAt": null
-    ///   },
-    ///   "message": "Tip created successfully"
-    /// }
-    /// ```
+    /// Cria uma nova dica. Campos obrigatórios: title, description, category (Stress/Sleep/Mood/Wellness).
+    /// Opcionais: icon, color.
     /// </remarks>
     /// <param name="dto">Dados da dica (title, description, category obrigatórios)</param>
     /// <returns>Dica criada com sucesso, incluindo ID gerado</returns>
@@ -239,36 +161,7 @@ public class TipsController : ControllerBase
     /// ✏️ Atualiza uma dica existente
     /// </summary>
     /// <remarks>
-    /// Permite atualizar os dados de uma dica existente no sistema.
-    /// 
-    /// **Todos os campos são opcionais**, mas se informados devem ser válidos.
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```json
-    /// PUT /api/v1/tips/3fa85f64-5717-4562-b3fc-2c963f66afa6
-    /// {
-    ///   "title": "Título Atualizado",
-    ///   "description": "Descrição atualizada da dica",
-    ///   "category": "Stress",
-    ///   "icon": "breath",
-    ///   "color": "#FF5722"
-    /// }
-    /// ```
-    /// 
-    /// **Exemplo de resposta (200 OK):**
-    /// ```json
-    /// {
-    ///   "success": true,
-    ///   "data": {
-    ///     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "title": "Título Atualizado",
-    ///     "description": "Descrição atualizada da dica",
-    ///     "category": "Stress",
-    ///     "updatedAt": "2025-11-14T11:00:00Z"
-    ///   },
-    ///   "message": "Tip updated successfully"
-    /// }
-    /// ```
+    /// Atualiza os dados de uma dica existente. Todos os campos são opcionais.
     /// </remarks>
     /// <param name="id">ID único da dica a ser atualizada (GUID)</param>
     /// <param name="dto">Dados atualizados da dica (todos os campos são opcionais)</param>

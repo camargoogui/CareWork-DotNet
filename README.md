@@ -58,8 +58,8 @@ O CareWork aborda um dos maiores desafios do século XXI: **a saúde mental no a
 
 ### Infraestrutura e Qualidade
 
-- **SQLite** - Banco de dados para desenvolvimento (macOS)
-- **SQL Server** - Banco de dados para produção (suporte também a Oracle e MongoDB)
+- **SQL Server** - Banco de dados padrão (conforme requisito: SQL Server, Oracle ou MongoDB)
+- **SQLite** - Opcional para desenvolvimento local (especialmente macOS)
 - **BCrypt** - Hash seguro de senhas
 - **xUnit + Coverlet** - Framework de testes moderno (111 testes, 66.9% cobertura)
 - **AutoMapper** - Mapeamento automático e performático
@@ -494,11 +494,20 @@ Authorization: Bearer {seu_token_aqui}
    dotnet restore
    ```
 
-3. **Configure a connection string** (opcional)
+3. **Configure a connection string**
    
-   Por padrão, usa SQLite (`Data Source=CareWorkDB.db`).
+   **Padrão (SQL Server - conforme requisito):**
    
-   Para SQL Server, edite `CareWork.API/appsettings.json`:
+   O `appsettings.json` já vem configurado com SQL Server:
+   ```json
+   {
+     "ConnectionStrings": {
+       "DefaultConnection": "Server=localhost;Database=CareWorkDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;"
+     }
+   }
+   ```
+   
+   **Para SQL Server LocalDB (Windows):**
    ```json
    {
      "ConnectionStrings": {
@@ -506,6 +515,21 @@ Authorization: Bearer {seu_token_aqui}
      }
    }
    ```
+   
+   **Para SQLite (opcional - desenvolvimento local, especialmente macOS):**
+   
+   Edite `appsettings.Development.json` (já configurado por padrão):
+   ```json
+   {
+     "ConnectionStrings": {
+       "DefaultConnection": "Data Source=CareWorkDB.db"
+     }
+   }
+   ```
+   
+   **Nota:** O projeto detecta automaticamente qual banco usar baseado na connection string:
+   - Se começar com `Data Source=`, usa SQLite
+   - Caso contrário, usa SQL Server (padrão)
 
 4. **Configure a chave JWT** (opcional)
    
@@ -533,8 +557,8 @@ Authorization: Bearer {seu_token_aqui}
 ### 🎉 Primeira Execução
 
 Na primeira execução, o sistema:
-- ✅ Cria o banco de dados automaticamente (SQLite: `CareWorkDB.db`)
-- ✅ Executa migrations do Entity Framework Core
+- ✅ Cria o banco de dados automaticamente (SQL Server ou SQLite, conforme configuração)
+- ✅ Executa migrations do Entity Framework Core (Code First)
 - ✅ Popula automaticamente com **20 tips pré-cadastradas** via `DbSeeder`:
   - 5 tips de **Stress** (Técnicas de Respiração, Meditação, etc.)
   - 5 tips de **Sleep** (Rotina de Sono, Ambiente Escuro, etc.)
@@ -903,8 +927,9 @@ A API foi validada para garantir que todas as lógicas estão "conversando bem" 
 
 #### 4. Integração e Persistência (30 pts) ✅
 - ✅ **Entity Framework Core**: Configurado
-  - SQLite para desenvolvimento (macOS)
-  - SQL Server para produção (configurável)
+  - **SQL Server** (padrão - conforme requisito)
+  - SQLite (opcional para desenvolvimento local, especialmente macOS)
+  - Suporte também a Oracle e MongoDB (configurável)
   - Code First approach
 - ✅ **Migrations**: Implementado
   - Migrations criadas e aplicadas

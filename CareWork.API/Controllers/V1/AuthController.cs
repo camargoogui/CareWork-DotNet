@@ -27,40 +27,7 @@ public class AuthController : ControllerBase
     /// 🔐 Realiza login e retorna token JWT
     /// </summary>
     /// <remarks>
-    /// Autentica um usuário existente e retorna um token JWT válido por 24 horas.
-    /// 
-    /// **Validações:**
-    /// - Email deve ser válido e existir no sistema
-    /// - Senha deve corresponder ao email informado
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```json
-    /// POST /api/v1/auth/login
-    /// {
-    ///   "email": "usuario@example.com",
-    ///   "password": "senha123"
-    /// }
-    /// ```
-    /// 
-    /// **Exemplo de resposta (200 OK):**
-    /// ```json
-    /// {
-    ///   "success": true,
-    ///   "data": {
-    ///     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    ///     "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "email": "usuario@example.com",
-    ///     "name": "João Silva"
-    ///   },
-    ///   "message": "Login successful"
-    /// }
-    /// ```
-    /// 
-    /// **Após o login:**
-    /// 1. Copie o `token` do campo `data.token`
-    /// 2. Clique no botão **Authorize** no topo do Swagger
-    /// 3. Cole o token no formato: `Bearer {seu-token}`
-    /// 4. Agora você pode testar todos os endpoints autenticados
+    /// Autentica um usuário e retorna token JWT válido por 24 horas. Use o token no botão Authorize.
     /// </remarks>
     /// <param name="dto">Credenciais de login (email e senha obrigatórios)</param>
     /// <returns>Token JWT e informações do usuário autenticado</returns>
@@ -109,45 +76,7 @@ public class AuthController : ControllerBase
     /// 📝 Registra um novo usuário e retorna token JWT
     /// </summary>
     /// <remarks>
-    /// Cria uma nova conta de usuário no sistema e retorna automaticamente um token JWT para autenticação imediata.
-    /// 
-    /// **Validações:**
-    /// - Email deve ser válido e único (não pode estar em uso)
-    /// - Senha é obrigatória (será criptografada com BCrypt)
-    /// - Nome deve conter apenas letras e espaços, com no mínimo 2 caracteres
-    /// 
-    /// **Exemplo de requisição:**
-    /// ```json
-    /// POST /api/v1/auth/register
-    /// {
-    ///   "email": "novo.usuario@example.com",
-    ///   "password": "senhaSegura123",
-    ///   "name": "João Silva"
-    /// }
-    /// ```
-    /// 
-    /// **Exemplo de resposta (201 Created):**
-    /// ```json
-    /// {
-    ///   "success": true,
-    ///   "data": {
-    ///     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    ///     "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    ///     "email": "novo.usuario@example.com",
-    ///     "name": "João Silva"
-    ///   },
-    ///   "message": "User registered successfully"
-    /// }
-    /// ```
-    /// 
-    /// **Após o registro:**
-    /// - O token JWT já está disponível na resposta
-    /// - Você pode usar este token imediatamente para autenticar outras requisições
-    /// - Não é necessário fazer login após o registro
-    /// 
-    /// **Erros comuns:**
-    /// - `400 Bad Request`: Email já está em uso ou dados inválidos
-    /// - `400 Bad Request`: Nome contém caracteres inválidos (aceita apenas letras e espaços)
+    /// Cria uma nova conta e retorna token JWT automaticamente. Email deve ser único, nome apenas letras.
     /// </remarks>
     /// <param name="dto">Dados do novo usuário (email, password, name - todos obrigatórios)</param>
     /// <returns>Token JWT e informações do usuário criado</returns>
@@ -206,17 +135,7 @@ public class AuthController : ControllerBase
     /// Atualiza o perfil do usuário autenticado
     /// </summary>
     /// <remarks>
-    /// Permite atualizar nome e email do usuário.
-    /// 
-    /// Exemplo de requisição:
-    /// 
-    ///     PUT /api/v1/auth/profile
-    ///     {
-    ///       "name": "João Silva",
-    ///       "email": "novoemail@example.com"
-    ///     }
-    ///     
-    /// **Importante:** O email não pode estar em uso por outro usuário.
+    /// Atualiza nome e/ou email do usuário. Email deve ser único.
     /// </remarks>
     /// <param name="dto">Novos dados do perfil</param>
     /// <returns>Dados atualizados do usuário</returns>
@@ -299,7 +218,7 @@ public class AuthController : ControllerBase
     /// Atualiza a senha do usuário autenticado
     /// </summary>
     /// <remarks>
-    /// Requer a senha atual para confirmar a alteração.
+    /// Atualiza a senha do usuário. Requer senha atual para confirmação.
     /// 
     /// Exemplo de requisição:
     /// 
