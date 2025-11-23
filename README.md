@@ -553,7 +553,7 @@ Authorization: Bearer {seu_token_aqui}
 6. **Acesse o Swagger**
    
    Abra o navegador em: `http://localhost:8080/swagger`
-
+F
 ### 🎉 Primeira Execução
 
 Na primeira execução, o sistema:

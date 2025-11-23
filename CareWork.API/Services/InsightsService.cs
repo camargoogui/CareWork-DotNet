@@ -233,6 +233,7 @@ public class InsightsService : IInsightsService
 
         // 4. Wellness: Recomendar se tudo está bem (manter progresso)
         // Apenas se NÃO há problemas identificados acima
+        var isWellnessOnly = false;
         if (!recommendedCategories.Any() &&
             moodTrend.Average >= 3.5 &&
             stressTrend.Average < 3.5 &&
@@ -243,23 +244,53 @@ public class InsightsService : IInsightsService
         {
             // Tudo está bem - recomendar Wellness para manter o progresso
             recommendedCategories.Add("Wellness");
+            isWellnessOnly = true;
         }
 
         // 5. Fallback: Se não identificou nenhuma área problemática, usar Wellness
         if (!recommendedCategories.Any())
         {
             recommendedCategories.Add("Wellness");
+            isWellnessOnly = true;
         }
 
         // Buscar dicas por categoria
         var allTipsResult = await _tipService.GetTipsAsync(1, 50);
         var recommended = new List<TipDto>();
 
+        // Determinar quantidade de tips baseado em:
+        // 1. Se há problemas identificados (retornar mais tips)
+        // 2. Se tudo está bem (retornar menos tips)
+        // 3. Qualidade das médias (médias muito altas = menos necessidade)
+        var hasProblems = recommendedCategories.Any(c => c != "Wellness");
+        var maxTips = 5; // Padrão quando há problemas
+        
+        if (isWellnessOnly)
+        {
+            // Tudo está bem - considerar qualidade das médias
+            var excellentMood = moodTrend.Average >= 4.5;
+            var excellentSleep = sleepTrend.Average >= 4.5;
+            var veryLowStress = stressTrend.Average <= 1.5;
+            
+            // Se tudo está excelente, retornar apenas 2 tips
+            // Se está bom mas não excelente, retornar 3 tips
+            if (excellentMood && excellentSleep && veryLowStress)
+            {
+                maxTips = 2; // Excelente - apenas 2 tips para manter
+            }
+            else
+            {
+                maxTips = 3; // Bom - 3 tips para manter progresso
+            }
+        }
+
         // Priorizar categorias identificadas
         // Se há apenas 1 categoria problemática: até 5 tips dessa categoria
         // Se há múltiplas categorias: distribuir proporcionalmente
         var categoriesCount = recommendedCategories.Distinct().Count();
-        var tipsPerCategory = categoriesCount == 1 ? 5 : (categoriesCount == 2 ? 3 : 2);
+        var tipsPerCategory = hasProblems 
+            ? (categoriesCount == 1 ? 5 : (categoriesCount == 2 ? 3 : 2))
+            : (maxTips / categoriesCount); // Quando Wellness only, distribuir igualmente
 
         foreach (var category in recommendedCategories.Distinct())
         {
@@ -274,8 +305,18 @@ public class InsightsService : IInsightsService
 
         // Se não encontrou suficientes das categorias identificadas, adicionar apenas Wellness
         // NÃO adicionar outras categorias que não foram identificadas como problemáticas
-        if (recommended.Count < 5)
+        if (recommended.Count < maxTips && !hasProblems)
         {
+            var wellnessTips = allTipsResult.Data
+                .Where(t => (t.Category ?? "Wellness") == "Wellness")
+                .Where(t => !recommended.Any(r => r.Id == t.Id))
+                .Take(maxTips - recommended.Count)
+                .ToList();
+            recommended.AddRange(wellnessTips);
+        }
+        else if (recommended.Count < 5 && hasProblems)
+        {
+            // Se há problemas mas não encontrou suficientes, completar com Wellness
             var wellnessTips = allTipsResult.Data
                 .Where(t => (t.Category ?? "Wellness") == "Wellness")
                 .Where(t => !recommended.Any(r => r.Id == t.Id))
@@ -284,7 +325,7 @@ public class InsightsService : IInsightsService
             recommended.AddRange(wellnessTips);
         }
 
-        return recommended.Take(5).ToList();
+        return recommended.Take(maxTips).ToList();
     }
 
     // Métodos auxiliares privados
@@ -337,10 +378,14 @@ public class InsightsService : IInsightsService
         var change = secondHalf - firstHalf;
         var changePercentage = firstHalf != 0 ? (change / firstHalf) * 100 : 0;
 
+        // Com poucos dados (< 5), ser mais conservador na análise de tendência
+        // Aumentar o threshold para evitar falsos positivos
+        var threshold = values.Count < 5 ? 15.0 : 5.0;
+
         string trend;
-        if (changePercentage > 5)
+        if (changePercentage > threshold)
             trend = "improving";
-        else if (changePercentage < -5)
+        else if (changePercentage < -threshold)
             trend = "declining";
         else
             trend = "stable";
@@ -464,20 +509,29 @@ public class InsightsService : IInsightsService
     {
         var insights = new List<string>();
 
+        // Mood: Considerar média absoluta antes de gerar insights negativos
+        // Só alertar se realmente está ruim (média baixa) E piorando
         if (mood.Trend == "improving")
             insights.Add("Seu humor está melhorando! Continue assim.");
-        else if (mood.Trend == "declining")
+        else if (mood.Trend == "declining" && mood.Average < 3.5)
             insights.Add("Seu humor está em declínio. Considere buscar apoio.");
+        else if (mood.Trend == "declining" && mood.Average >= 3.5)
+            insights.Add("Seu humor está ligeiramente em declínio, mas ainda está em bom nível.");
 
+        // Stress: Já está correto (só alerta se aumentando E média alta)
         if (stress.Trend == "declining")
             insights.Add("Ótimo! Seu nível de stress está diminuindo.");
         else if (stress.Trend == "improving" && stress.Average > 3)
             insights.Add("Seu stress está aumentando. Tente técnicas de relaxamento.");
 
+        // Sleep: Considerar média absoluta antes de gerar insights negativos
+        // Só alertar se realmente está ruim (média baixa) E piorando
         if (sleep.Trend == "improving")
             insights.Add("Sua qualidade de sono está melhorando!");
-        else if (sleep.Trend == "declining")
+        else if (sleep.Trend == "declining" && sleep.Average < 3.5)
             insights.Add("Sua qualidade de sono precisa de atenção.");
+        else if (sleep.Trend == "declining" && sleep.Average >= 3.5)
+            insights.Add("Sua qualidade de sono está ligeiramente em declínio, mas ainda está em bom nível.");
 
         // Análise de correlação
         if (checkins.Count >= 7)
