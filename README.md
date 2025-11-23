@@ -142,8 +142,12 @@ CareWork-DotNet/
 
 ### Base URL
 ```
-http://localhost:8080/api/v1
+http://localhost:8080
 ```
+
+**Endpoints da API:**
+- V1: `http://localhost:8080/api/v1/...`
+- V2: `http://localhost:8080/api/v2/...`
 
 ### 📚 Documentação Completa
 Todos os endpoints estão documentados no Swagger UI (`http://localhost:8080/swagger`). 
@@ -158,8 +162,10 @@ Abaixo estão os principais endpoints e exemplos de uso.
 
 ### 🔐 Autenticação
 
-#### POST `/api/v1/auth/register`
+#### POST `http://localhost:8080/api/v1/auth/register`
 Registra um novo usuário e retorna token JWT.
+
+**URL completa:** `http://localhost:8080/api/v1/auth/register`
 
 **Request:**
 ```json
@@ -175,30 +181,44 @@ Registra um novo usuário e retorna token JWT.
 - `password`: Mínimo 6 caracteres, obrigatório
 - `name`: Mínimo 2 caracteres, máximo 200, apenas letras e espaços
 
-#### POST `/api/v1/auth/login`
+#### POST `http://localhost:8080/api/v1/auth/login`
 Realiza login e retorna token JWT.
 
-#### PUT `/api/v1/auth/profile` 🔒
+**URL completa:** `http://localhost:8080/api/v1/auth/login`
+
+#### PUT `http://localhost:8080/api/v1/auth/profile` 🔒
 Atualiza nome e email do perfil do usuário autenticado.
 
-#### PUT `/api/v1/auth/password` 🔒
+**URL completa:** `http://localhost:8080/api/v1/auth/profile`
+
+#### PUT `http://localhost:8080/api/v1/auth/password` 🔒
 Atualiza senha do usuário (requer senha atual).
 
-#### DELETE `/api/v1/auth/account` 🔒
+**URL completa:** `http://localhost:8080/api/v1/auth/password`
+
+#### DELETE `http://localhost:8080/api/v1/auth/account` 🔒
 Deleta conta do usuário permanentemente (requer confirmação com senha).
+
+**URL completa:** `http://localhost:8080/api/v1/auth/account`
 
 ### 📝 Check-ins
 
 Todos os endpoints requerem autenticação JWT.
 
-#### GET `/api/v1/checkins?page=1&pageSize=10`
+#### GET `http://localhost:8080/api/v1/checkins?page=1&pageSize=10`
 Lista check-ins do usuário com paginação e HATEOAS.
 
-#### GET `/api/v1/checkins/{id}`
+**URL completa:** `http://localhost:8080/api/v1/checkins?page=1&pageSize=10`
+
+#### GET `http://localhost:8080/api/v1/checkins/{id}`
 Busca check-in específico por ID.
 
-#### POST `/api/v1/checkins`
+**URL completa:** `http://localhost:8080/api/v1/checkins/{id}` (substitua `{id}` pelo ID do check-in)
+
+#### POST `http://localhost:8080/api/v1/checkins`
 Cria novo check-in com notas e tags opcionais.
+
+**URL completa:** `http://localhost:8080/api/v1/checkins`
 
 **Request:**
 ```json
@@ -216,18 +236,24 @@ Cria novo check-in com notas e tags opcionais.
 - `notes`: Máximo 1000 caracteres (opcional)
 - `tags`: Lista de strings (opcional)
 
-#### PUT `/api/v1/checkins/{id}`
+#### PUT `http://localhost:8080/api/v1/checkins/{id}`
 Atualiza check-in existente.
 
-#### DELETE `/api/v1/checkins/{id}`
+**URL completa:** `http://localhost:8080/api/v1/checkins/{id}` (substitua `{id}` pelo ID do check-in)
+
+#### DELETE `http://localhost:8080/api/v1/checkins/{id}`
 Deleta check-in.
+
+**URL completa:** `http://localhost:8080/api/v1/checkins/{id}` (substitua `{id}` pelo ID do check-in)
 
 ### 💡 Tips (Dicas de Bem-estar)
 
 **Importante:** As tips são pré-cadastradas no sistema (20 tips iniciais). Usuários apenas visualizam e recebem recomendações.
 
-#### GET `/api/v1/tips?page=1&pageSize=10&category=Stress`
+#### GET `http://localhost:8080/api/v1/tips?page=1&pageSize=10&category=Stress`
 Lista dicas com paginação, filtro por categoria e HATEOAS.
+
+**URL completa:** `http://localhost:8080/api/v1/tips?page=1&pageSize=10&category=Stress`
 
 **Categorias disponíveis:**
 - `Stress` - Gerenciamento de stress
@@ -235,22 +261,32 @@ Lista dicas com paginação, filtro por categoria e HATEOAS.
 - `Mood` - Melhoria do humor
 - `Wellness` - Bem-estar geral
 
-#### GET `/api/v1/tips/{id}`
+#### GET `http://localhost:8080/api/v1/tips/{id}`
 Busca dica específica por ID.
 
-#### POST `/api/v1/tips` 🔒
+**URL completa:** `http://localhost:8080/api/v1/tips/{id}` (substitua `{id}` pelo ID da tip)
+
+#### POST `http://localhost:8080/api/v1/tips` 🔒
 Cria nova dica (para administração futura).
 
-#### PUT `/api/v1/tips/{id}` 🔒
+**URL completa:** `http://localhost:8080/api/v1/tips`
+
+#### PUT `http://localhost:8080/api/v1/tips/{id}` 🔒
 Atualiza dica existente.
 
-#### DELETE `/api/v1/tips/{id}` 🔒
+**URL completa:** `http://localhost:8080/api/v1/tips/{id}` (substitua `{id}` pelo ID da tip)
+
+#### DELETE `http://localhost:8080/api/v1/tips/{id}` 🔒
 Deleta dica.
+
+**URL completa:** `http://localhost:8080/api/v1/tips/{id}` (substitua `{id}` pelo ID da tip)
 
 ### 📊 Relatórios
 
-#### GET `/api/v1/reports/weekly?weekStart=2024-11-04`
+#### GET `http://localhost:8080/api/v1/reports/weekly?weekStart=2024-11-04`
 Gera relatório semanal completo com:
+
+**URL completa:** `http://localhost:8080/api/v1/reports/weekly?weekStart=2024-11-04`
 - Médias de mood, stress e sleep
 - Dados diários da semana
 - Melhor e pior dia da semana
@@ -283,8 +319,10 @@ Gera relatório semanal completo com:
 }
 ```
 
-#### GET `/api/v1/reports/monthly?year=2024&month=11`
+#### GET `http://localhost:8080/api/v1/reports/monthly?year=2024&month=11`
 Gera relatório mensal completo com:
+
+**URL completa:** `http://localhost:8080/api/v1/reports/monthly?year=2024&month=11`
 - Resumo semanal do mês
 - Médias mensais
 - Melhor e pior dia do mês
@@ -321,8 +359,10 @@ Gera relatório mensal completo com:
 
 ### 🔍 Insights e Análises
 
-#### GET `/api/v1/insights/trends?period=week`
+#### GET `http://localhost:8080/api/v1/insights/trends?period=week`
 Análise de tendências dos últimos 7 dias, mês ou ano.
+
+**URL completa:** `http://localhost:8080/api/v1/insights/trends?period=week`
 
 **Parâmetros:**
 - `period`: `week`, `month` ou `year` (padrão: `week`)
@@ -332,20 +372,32 @@ Análise de tendências dos últimos 7 dias, mês ou ano.
 - Médias e percentuais de mudança
 - Insights e alerts personalizados
 
-#### GET `/api/v1/insights/streak`
+#### GET `http://localhost:8080/api/v1/insights/streak`
 Calcula sequência de check-ins consecutivos:
+
+**URL completa:** `http://localhost:8080/api/v1/insights/streak`
 - Sequência atual
 - Maior sequência já alcançada
 - Status (ativo/inativo)
 
-#### GET `/api/v1/insights/compare?start1=...&end1=...&start2=...&end2=...`
+#### GET `http://localhost:8080/api/v1/insights/compare?start1=...&end1=...&start2=...&end2=...`
 Compara dois períodos de check-ins:
+
+**URL completa:** `http://localhost:8080/api/v1/insights/compare?start1=2024-11-01&end1=2024-11-07&start2=2024-11-08&end2=2024-11-14`
+
+**Parâmetros:**
+- `start1`: Data de início do primeiro período (YYYY-MM-DD)
+- `end1`: Data de fim do primeiro período (YYYY-MM-DD)
+- `start2`: Data de início do segundo período (YYYY-MM-DD)
+- `end2`: Data de fim do segundo período (YYYY-MM-DD)
 - Médias de cada período
 - Mudanças percentuais
 - Tendência geral (better/worse/similar)
 
-#### GET `/api/v1/insights/recommended-tips`
+#### GET `http://localhost:8080/api/v1/insights/recommended-tips`
 Recomenda até 5 dicas personalizadas baseadas em análise inteligente:
+
+**URL completa:** `http://localhost:8080/api/v1/insights/recommended-tips`
 
 **Lógica de Recomendação:**
 - **Sleep/Mood**: Recomenda se média ≤ 3.0 OU (média ≤ 3.5 E tendência "declining")
@@ -379,8 +431,10 @@ Recomenda até 5 dicas personalizadas baseadas em análise inteligente:
 
 ### 🏥 Health Check
 
-#### GET `/health`
+#### GET `http://localhost:8080/health`
 Endpoint de health check para monitoramento.
+
+**URL completa:** `http://localhost:8080/health`
 
 **Response:**
 ```json
@@ -398,14 +452,24 @@ A API utiliza **JWT (JSON Web Tokens)** para autenticação.
 
 ### Como usar no Swagger:
 
-1. Faça login em `POST /api/v1/auth/login`
-2. Copie o `token` da resposta
-3. Clique no botão **"Authorize"** (canto superior direito)
-4. Cole o token no formato: `Bearer {seu_token}` ou apenas `{seu_token}`
-5. Clique em **"Authorize"** e depois **"Close"**
+1. Acesse o Swagger UI: `http://localhost:8080/swagger`
+2. Faça login em `POST http://localhost:8080/api/v1/auth/login` ou `POST http://localhost:8080/api/v1/auth/register`
+3. Copie o `token` retornado no campo `data.token` da resposta
+4. Clique no botão **"Authorize"** (canto superior direito do Swagger)
+5. Cole o token no formato: `Bearer {seu_token}` ou apenas `{seu_token}`
+6. Clique em **"Authorize"** e depois **"Close"**
+7. Agora você pode testar todos os endpoints protegidos
 
 ### Como usar em requisições HTTP:
 
+```bash
+# Exemplo com curl
+curl -X GET "http://localhost:8080/api/v1/checkins" \
+  -H "Authorization: Bearer {seu_token_aqui}" \
+  -H "Content-Type: application/json"
+```
+
+**Header necessário:**
 ```
 Authorization: Bearer {seu_token_aqui}
 ```
@@ -421,7 +485,7 @@ Authorization: Bearer {seu_token_aqui}
 
 1. **Clone o repositório**
    ```bash
-   git clone https://github.com/seu-usuario/CareWork-DotNet.git
+   git clone https://github.com/camargoogui/CareWork-DotNet.git
    cd CareWork-DotNet
    ```
 
@@ -578,8 +642,8 @@ A API utiliza **versionamento por URL**: `/api/v1/` e `/api/v2/`
 **Exemplo:**
 ```bash
 # Ambas funcionam:
-POST /api/v1/checkins → ✅ Funciona
-POST /api/v2/checkins → ✅ Também funciona
+POST http://localhost:8080/api/v1/checkins → ✅ Funciona
+POST http://localhost:8080/api/v2/checkins → ✅ Também funciona
 ```
 
 ### Estratégia
@@ -597,7 +661,9 @@ POST /api/v2/checkins → ✅ Também funciona
 
 ### Health Check
 
-Endpoint disponível em `/health` para verificação de saúde da aplicação e banco de dados.
+Endpoint disponível em `http://localhost:8080/health` para verificação de saúde da aplicação e banco de dados.
+
+**URL completa:** `http://localhost:8080/health`
 
 ### Logging Estruturado
 
