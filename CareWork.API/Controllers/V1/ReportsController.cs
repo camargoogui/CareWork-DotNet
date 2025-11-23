@@ -6,9 +6,13 @@ using CareWork.API.Services;
 
 namespace CareWork.API.Controllers.V1;
 
+/// <summary>
+/// Controller V1 para Relatórios Semanais e Mensais
+/// </summary>
 [ApiController]
 [Route("api/v1/reports")]
 [Authorize]
+[ApiExplorerSettings(GroupName = "v1")]
 public class ReportsController : ControllerBase
 {
     private readonly ICheckinService _checkinService;

@@ -13,6 +13,7 @@ namespace CareWork.API.Controllers.V2;
 [ApiController]
 [Route("api/v2/checkins")]
 [Authorize]
+[ApiExplorerSettings(GroupName = "v2")]
 public class CheckinsController : ControllerBase
 {
     private readonly ICheckinService _checkinService;

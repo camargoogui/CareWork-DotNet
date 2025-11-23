@@ -12,6 +12,7 @@ namespace CareWork.API.Controllers.V2;
 /// </summary>
 [ApiController]
 [Route("api/v2/auth")]
+[ApiExplorerSettings(GroupName = "v2")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;

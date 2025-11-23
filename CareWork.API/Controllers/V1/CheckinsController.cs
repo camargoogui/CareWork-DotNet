@@ -6,9 +6,13 @@ using CareWork.API.Services;
 
 namespace CareWork.API.Controllers.V1;
 
+/// <summary>
+/// Controller V1 para Gerenciamento de Check-ins
+/// </summary>
 [ApiController]
 [Route("api/v1/checkins")]
 [Authorize]
+[ApiExplorerSettings(GroupName = "v1")]
 public class CheckinsController : ControllerBase
 {
     private readonly ICheckinService _checkinService;

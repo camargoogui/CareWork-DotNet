@@ -6,8 +6,12 @@ using CareWork.API.Services;
 
 namespace CareWork.API.Controllers.V1;
 
+/// <summary>
+/// Controller V1 para Autenticação e Gestão de Usuário
+/// </summary>
 [ApiController]
 [Route("api/v1/auth")]
+[ApiExplorerSettings(GroupName = "v1")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;

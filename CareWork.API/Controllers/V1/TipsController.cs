@@ -5,9 +5,13 @@ using CareWork.API.Services;
 
 namespace CareWork.API.Controllers.V1;
 
+/// <summary>
+/// Controller V1 para Gerenciamento de Tips (Dicas de Bem-estar)
+/// </summary>
 [ApiController]
 [Route("api/v1/tips")]
 [Authorize]
+[ApiExplorerSettings(GroupName = "v1")]
 public class TipsController : ControllerBase
 {
     private readonly ITipService _tipService;

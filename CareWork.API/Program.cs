@@ -13,31 +13,42 @@ using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog
+// ============================================================================
+// CONFIGURAÇÃO DO SERILOG (STRUCTURED LOGGING)
+// ============================================================================
+// Configuração do Serilog através do appsettings.json
+// UseSerilog() automaticamente substitui os providers padrão, evitando duplicação
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.File("logs/carework-.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
-builder.Host.UseSerilog();
+// Usa Serilog como único provider de logging (substitui providers padrão automaticamente)
+builder.Host.UseSerilog(dispose: true);
 
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger/OpenAPI
+// ============================================================================
+// CONFIGURAÇÃO DO SWAGGER/OPENAPI
+// ============================================================================
+// Configuração de documentação da API com suporte a versionamento (V1 e V2)
+// Cada versão aparece isolada no Swagger UI através do ApiExplorerSettings
+// ============================================================================
 builder.Services.AddSwaggerGen(c =>
 {
+    // ------------------------------------------------------------------------
+    // Documento Swagger para V1 (Versão Completa e Estável)
+    // ------------------------------------------------------------------------
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "CareWork API",
+        Title = "CareWork API V1",
         Version = "v1",
         Description = @"
-## 🎯 API RESTful para Plataforma de Bem-estar Emocional
+## 🎯 API RESTful para Plataforma de Bem-estar Emocional - Versão 1
 
-A **CareWork API** é uma API completa desenvolvida em .NET 8 para gerenciamento de bem-estar emocional em ambientes de trabalho híbridos.
+A **CareWork API V1** é a versão completa e estável da API desenvolvida em .NET 8 para gerenciamento de bem-estar emocional em ambientes de trabalho híbridos.
 
 ### 📋 Funcionalidades Principais
 
@@ -59,7 +70,7 @@ Esta API utiliza **JWT (JSON Web Tokens)** para autenticação.
 
 ### 📚 Documentação Completa
 
-Para mais informações, consulte o README do projeto ou a documentação completa em `ENDPOINTS_MOBILE.md`.
+Para mais informações, consulte o README do projeto.
 
 ### 🚀 Base URL
 
@@ -87,9 +98,12 @@ http://localhost:8080/api/v1
         TermsOfService = new Uri("https://carework.com/terms")
     });
 
+    // ------------------------------------------------------------------------
+    // Documento Swagger para V2 (Versão com Melhorias)
+    // ------------------------------------------------------------------------
     c.SwaggerDoc("v2", new OpenApiInfo
     {
-        Title = "CareWork API",
+        Title = "CareWork API V2",
         Version = "v2",
         Description = @"
 ## 🎯 API RESTful para Plataforma de Bem-estar Emocional - Versão 2
@@ -117,7 +131,10 @@ A V2 mantém compatibilidade com a V1, permitindo migração gradual.
         }
     });
 
-    // Habilitar XML comments para documentação
+    // ------------------------------------------------------------------------
+    // Configuração de Documentação XML
+    // ------------------------------------------------------------------------
+    // Habilita comentários XML dos controllers para aparecer no Swagger
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
@@ -125,22 +142,42 @@ A V2 mantém compatibilidade com a V1, permitindo migração gradual.
         c.IncludeXmlComments(xmlPath);
     }
 
-    // Adicionar tags para organizar endpoints
+    // ------------------------------------------------------------------------
+    // Organização de Tags (Agrupamento de Endpoints)
+    // ------------------------------------------------------------------------
+    // Organiza os endpoints por nome do controller no Swagger UI
     c.TagActionsBy(api =>
     {
-        if (api.GroupName != null)
-        {
-            return new[] { api.GroupName };
-        }
-
         var controllerName = api.ActionDescriptor.RouteValues["controller"];
         return new[] { controllerName ?? "Default" };
     });
 
-    // Ordenar endpoints por tags
-    c.DocInclusionPredicate((name, api) => true);
+    // ------------------------------------------------------------------------
+    // Filtro de Inclusão por Versão (CRÍTICO PARA SEPARAÇÃO)
+    // ------------------------------------------------------------------------
+    // Este filtro garante que cada versão do Swagger mostre APENAS os endpoints
+    // da sua respectiva versão, baseado no GroupName definido nos controllers
+    // através do atributo [ApiExplorerSettings(GroupName = "v1" ou "v2")]
+    c.DocInclusionPredicate((docName, apiDesc) =>
+    {
+        // Obtém o GroupName do ApiDescription
+        // O GroupName é definido pelo atributo [ApiExplorerSettings(GroupName = "v1" ou "v2")]
+        // nos controllers
+        var groupName = apiDesc.GroupName;
 
-    // Add JWT authentication to Swagger
+        // Se não tem GroupName definido, não inclui em nenhuma versão
+        if (string.IsNullOrEmpty(groupName))
+            return false;
+
+        // Inclui o endpoint apenas se o GroupName corresponder ao documento solicitado
+        // Exemplo: se docName = "v1" e groupName = "v1", retorna true
+        return docName == groupName;
+    });
+
+    // ------------------------------------------------------------------------
+    // Configuração de Autenticação JWT no Swagger
+    // ------------------------------------------------------------------------
+    // Permite testar endpoints autenticados diretamente no Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = @"
@@ -185,7 +222,9 @@ Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI...
     });
 });
 
-// Configure Entity Framework
+// ============================================================================
+// CONFIGURAÇÃO DO ENTITY FRAMEWORK CORE
+// ============================================================================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -203,7 +242,9 @@ builder.Services.AddDbContext<CareWorkDbContext>(options =>
     }
 });
 
-// Configure JWT Authentication
+// ============================================================================
+// CONFIGURAÇÃO DE AUTENTICAÇÃO JWT
+// ============================================================================
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured");
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "CareWork";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "CareWork";
@@ -229,20 +270,30 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Configure AutoMapper
+// ============================================================================
+// CONFIGURAÇÃO DO AUTOMAPPER
+// ============================================================================
 builder.Services.AddAutoMapper(typeof(Program));
 
-// Register services
+// ============================================================================
+// REGISTRO DE SERVIÇOS (DEPENDENCY INJECTION)
+// ============================================================================
 builder.Services.AddScoped<ICheckinService, CheckinService>();
 builder.Services.AddScoped<ITipService, TipService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IInsightsService, InsightsService>();
 
-// Configure Health Checks
+// ============================================================================
+// CONFIGURAÇÃO DE HEALTH CHECKS
+// ============================================================================
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<CareWorkDbContext>();
 
-// Configure OpenTelemetry (sem console exporter para reduzir verbosidade)
+// ============================================================================
+// CONFIGURAÇÃO DO OPENTELEMETRY (DISTRIBUTED TRACING)
+// ============================================================================
+// Configurado sem console exporter para reduzir verbosidade em desenvolvimento
+// Em produção, configure para exportar para Application Insights ou outro sistema
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracerProviderBuilder =>
     {
@@ -255,7 +306,9 @@ builder.Services.AddOpenTelemetry()
         // Em produção, configure para exportar para Application Insights ou outro sistema
     });
 
-// Configure CORS
+// ============================================================================
+// CONFIGURAÇÃO DE CORS (CROSS-ORIGIN RESOURCE SHARING)
+// ============================================================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -269,35 +322,70 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
-// Swagger sempre habilitado para facilitar desenvolvimento e testes
+// ============================================================================
+// CONFIGURAÇÃO DO PIPELINE HTTP
+// ============================================================================
+
+// ------------------------------------------------------------------------
+// Swagger/OpenAPI (Sempre habilitado para desenvolvimento e testes)
+// ------------------------------------------------------------------------
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
+    // Configuração dos documentos Swagger para cada versão
+    // Cada versão aparece como um seletor no topo do Swagger UI
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "CareWork API V1");
     c.SwaggerEndpoint("/swagger/v2/swagger.json", "CareWork API V2");
+    
+    // Configurações de UI
     c.RoutePrefix = "swagger"; // Swagger UI em /swagger
     c.DisplayRequestDuration(); // Mostra tempo de requisição
     c.EnableDeepLinking(); // Permite links diretos para endpoints
     c.EnableFilter(); // Habilita filtro de busca
+    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List); // Expande lista por padrão
 });
 
-// CORS deve vir ANTES de tudo (exceto Swagger)
+// ------------------------------------------------------------------------
+// CORS (Deve vir ANTES de autenticação e autorização)
+// ------------------------------------------------------------------------
 app.UseCors("AllowAll");
 
-app.UseSerilogRequestLogging();
+// ------------------------------------------------------------------------
+// Logging de Requisições (Serilog)
+// ------------------------------------------------------------------------
+// Configurado para logar apenas requisições HTTP (não duplica logs de inicialização)
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.GetLevel = (httpContext, elapsed, ex) => ex != null || elapsed > 1000
+        ? Serilog.Events.LogEventLevel.Warning
+        : Serilog.Events.LogEventLevel.Information;
+});
 
+// ------------------------------------------------------------------------
+// HTTPS Redirection
+// ------------------------------------------------------------------------
 app.UseHttpsRedirection();
 
+// ------------------------------------------------------------------------
+// Autenticação e Autorização (Ordem importante!)
+// ------------------------------------------------------------------------
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Custom exception handling middleware
+// ------------------------------------------------------------------------
+// Middleware Customizado de Tratamento de Exceções
+// ------------------------------------------------------------------------
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+// ------------------------------------------------------------------------
+// Mapeamento de Controllers
+// ------------------------------------------------------------------------
 app.MapControllers();
 
-// Health Check endpoint
+// ------------------------------------------------------------------------
+// Health Check Endpoint
+// ------------------------------------------------------------------------
 app.MapHealthChecks("/health");
 
 // Ensure database is created and seed initial data

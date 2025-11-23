@@ -6,9 +6,13 @@ using CareWork.API.Services;
 
 namespace CareWork.API.Controllers.V1;
 
+/// <summary>
+/// Controller V1 para Insights e Análises de Bem-estar
+/// </summary>
 [ApiController]
 [Route("api/v1/insights")]
 [Authorize]
+[ApiExplorerSettings(GroupName = "v1")]
 public class InsightsController : ControllerBase
 {
     private readonly IInsightsService _insightsService;
